@@ -1,0 +1,94 @@
+<html>
+<head>
+    <style type="text/css">
+
+        body {
+            touch-action:none;
+        }
+
+    </style>
+
+    <script type="text/jscript" src="jquery-3.2.1.min.js"></script>
+    <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
+</head>
+<body>
+
+<h1>PDF List</h1>
+
+<div id="tree">
+</div>
+<ul id="treeview1">
+
+</ul>
+<script>
+
+    document.documentElement.addEventListener('gestureend', function (event) {
+        alert("aaa");
+    }, false);
+    document.documentElement.addEventListener('touchstart', function (event) {
+        if (event.touches.length > 1) {
+            event.preventDefault();
+        }
+    }, false);
+
+    var lastTouchEnd = 0;
+    document.documentElement.addEventListener('touchend', function (event) {
+        var now = (new Date()).getTime();
+        if (now - lastTouchEnd <= 300) {
+            event.preventDefault();
+        }
+        lastTouchEnd = now;
+    }, false);
+</script>
+
+<script type="text/javascript">
+
+
+    // 表示文字列とリンクを指定して，webのfileオプションにpdfファイルを指定したリンクを作成する
+    function create_anchor(display, pdf_file){
+        let anchor = document.createElement("a");
+        let text = document.createTextNode( display );
+        anchor.appendChild(text);
+        anchor.setAttribute("href", "/web?file=" + pdf_file );
+        anchor.setAttribute("target", "_blanc" );
+        return anchor;
+    }
+
+    // ツリー構造のオブジェクトから，リーフノードをリストとして抽出する
+    function list_elements(tree, prefix, elements){
+
+        for (let node of tree) {
+
+            if ((typeof node) == "object") {
+                list_elements(node["children"], node["name"], elements);
+            } else {
+                elements.push(prefix + "/" + node);
+            }
+        }
+    }
+
+    // pdfリストを作成する
+    function make_list(){
+
+        let str = <%- tree %>;
+        let tree = JSON.parse(str);
+
+        let document_list = [];
+        list_elements(tree, "", document_list);
+
+        let ul = document.getElementById("treeview1");
+
+        for (let element of document_list){
+            let li = document.createElement("li");
+            li.appendChild(create_anchor(element, element));
+            ul.appendChild(li);
+        }
+    }
+
+    make_list();
+
+</script>
+
+
+</body>
+</html>
