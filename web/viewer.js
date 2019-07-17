@@ -1659,7 +1659,7 @@ var PDFViewerApplication = {
     };
 
     window.addEventListener('visibilitychange', webViewerVisibilityChange);
-    window.addEventListener('wheel', webViewerWheel);
+    window.addEventListener('wheel', webViewerWheel, {passive: false});
     window.addEventListener('click', webViewerClick);
     window.addEventListener('keydown', webViewerKeyDown);
     window.addEventListener('resize', _boundEvents.windowResize);
@@ -9096,7 +9096,7 @@ function () {
       this.touchSwipeBind = this._touchSwipe.bind(this);
       window.addEventListener('mousemove', this.showControlsBind);
       window.addEventListener('mousedown', this.mouseDownBind);
-      window.addEventListener('wheel', this.mouseWheelBind);
+      window.addEventListener('wheel', this.mouseWheelBind, {passive: false});
       window.addEventListener('keydown', this.resetMouseScrollStateBind);
       window.addEventListener('contextmenu', this.contextMenuBind);
       window.addEventListener('touchstart', this.touchSwipeBind);
