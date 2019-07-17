@@ -2268,6 +2268,7 @@ function setZoomDisabledTimeout() {
   }, WHEEL_ZOOM_DISABLED_TIMEOUT);
 }
 
+var zoom_val = 0;
 function webViewerWheel(evt) {
   var pdfViewer = PDFViewerApplication.pdfViewer;
 
@@ -2290,12 +2291,23 @@ function webViewerWheel(evt) {
 
     var previousScale = pdfViewer.currentScale;
     var delta = (0, _ui_utils.normalizeWheelEventDelta)(evt);
-    var MOUSE_WHEEL_DELTA_PER_PAGE_SCALE = 3.0;
-    var ticks = delta * MOUSE_WHEEL_DELTA_PER_PAGE_SCALE;
+    var MOUSE_WHEEL_DELTA_PER_PAGE_SCALE = 80.0;
+    var ticks = 0;
+    zoom_val += delta * MOUSE_WHEEL_DELTA_PER_PAGE_SCALE;
+    if (zoom_val > 1){
+      zoom_val -= 1;
+      ticks = 1;
+      console.log(ticks);
+    }
+    else if (zoom_val < -1){
+      zoom_val += 1;
+      ticks = -1;
+    }
 
     if (ticks < 0) {
       PDFViewerApplication.zoomOut(-ticks);
-    } else {
+    }
+    else if (ticks > 0) {
       PDFViewerApplication.zoomIn(ticks);
     }
 
