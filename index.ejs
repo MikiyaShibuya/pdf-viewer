@@ -1,4 +1,4 @@
-<html>
+    <html>
 <head>
     <style type="text/css">
 
@@ -9,6 +9,8 @@
     </style>
 
     <script type="text/jscript" src="jquery-3.2.1.min.js"></script>
+    <script type="text/jscript" src="jstree.min.js"></script>
+    <link href="style.min.css" rel="stylesheet" type="text/css">
     <meta name="viewport" content="width=device-width,initial-scale=1.0,minimum-scale=1.0,maximum-scale=1.0,user-scalable=no">
 </head>
 <body>
@@ -16,76 +18,97 @@
 <h1>PDF List</h1>
 
 <div id="tree">
+    <ul id="root">
+    </ul>
 </div>
 <ul id="treeview1">
 
 </ul>
-<script>
-
-    document.documentElement.addEventListener('gestureend', function (event) {
-        alert("aaa");
-    }, false);
-    document.documentElement.addEventListener('touchstart', function (event) {
-        if (event.touches.length > 1) {
-            event.preventDefault();
-        }
-    }, false);
-
-    var lastTouchEnd = 0;
-    document.documentElement.addEventListener('touchend', function (event) {
-        var now = (new Date()).getTime();
-        if (now - lastTouchEnd <= 300) {
-            event.preventDefault();
-        }
-        lastTouchEnd = now;
-    }, false);
-</script>
 
 <script type="text/javascript">
 
+    // register jtree item click listener that opens the document in new tab
+    $(function(){
+        $('#tree').on('changed.jstree', function (e, data) {
+            if (data.node.children.length == 0)
+                window.open(data.node.a_attr.href, '_blank');
 
-    // 表示文字列とリンクを指定して，webのfileオプションにpdfファイルを指定したリンクを作成する
+        }).jstree();
+    });
+
+    // create an anchor
     function create_anchor(display, pdf_file){
         let anchor = document.createElement("a");
         let text = document.createTextNode( display );
         anchor.appendChild(text);
         anchor.setAttribute("href", "/web?file=" + pdf_file );
         anchor.setAttribute("target", "_blanc" );
+        anchor.setAttribute("rel", "noopener noreferrer");
         return anchor;
     }
 
-    // ツリー構造のオブジェクトから，リーフノードをリストとして抽出する
-    function list_elements(tree, prefix, elements){
+    /*
+    木構造の定義
 
-        for (let node of tree) {
+    要素は文字列（リーフノード）かdict（中間ノード）
+    子要素はlistでまとめる
+
+    [
+        {
+        "name": "node",
+        "children":
+            ["leaf1", "leaf2", ... ]
+        },
+        {
+        "name": "node2",
+        "children":
+            ["leaf3", "leaf4",
+            {
+                "name": "node3",
+                "children": ["leaf5", ...]
+            }
+            ... ]
+        }
+    */
+
+    // tree構造の子要素をリストして返す
+    function list_child_nodes(prefix, tree, hierarchy){
+
+        let li_list = [];
+
+        for (let node of tree){
+            let li = document.createElement("li");
 
             if ((typeof node) == "object") {
-                list_elements(node["children"], node["name"], elements);
+                // ディレクトリは太字で末尾に/をつける
+                li.innerHTML = "<b>" + node["name"] + "/</b>";
+                let ul = document.createElement("ul");
+                for (let li of list_child_nodes(prefix+node["name"], node["children"], hierarchy + "/" + node["name"])){
+                    ul.appendChild(li);
+                }
+                li.appendChild(ul);
             } else {
-                elements.push(prefix + "/" + node);
+                li.setAttribute("data-jstree", '{ "icon" : "jstree-file" }');
+                li.appendChild(create_anchor(node, hierarchy+"/"+node));
             }
+
+            li_list.push(li);
         }
+        return li_list;
     }
 
-    // pdfリストを作成する
-    function make_list(){
-
-        let str = <%- tree %>;
+    function make_tree(str){
         let tree = JSON.parse(str);
 
-        let document_list = [];
-        list_elements(tree, "", document_list);
-
-        let ul = document.getElementById("treeview1");
-
-        for (let element of document_list){
-            let li = document.createElement("li");
-            li.appendChild(create_anchor(element, element));
+        let ul = document.getElementById("root");
+        for (let li of  list_child_nodes("", tree, "")){
             ul.appendChild(li);
         }
+
     }
 
-    make_list();
+    make_tree(<%- tree %>);
+
 
 </script>
 
