@@ -35,9 +35,20 @@ app.get("/web", function(req, res){
         });
 });
 
-// use 8000 as the port
-app.listen(8000, function(){
-    console.log("client connected");
+// Load port number from third argment
+// Default is 8000 (used when unspecified)
+let port = 8000
+try{
+    if (process.argv[2] != undefined){
+        port = parseInt(process.argv[2]);
+    }
+}
+catch(e){
+    console.log('catch : ' + e)
+}
+
+app.listen(port, function(){
+    console.log("client connected :" + port);
 });
 
 // listing documents
