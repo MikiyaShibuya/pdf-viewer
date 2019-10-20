@@ -2295,12 +2295,12 @@ function webViewerWheel(evt) {
     var ticks = 0;
     zoom_val += delta * MOUSE_WHEEL_DELTA_PER_PAGE_SCALE;
     if (zoom_val > 1){
-      zoom_val -= 1;
+      zoom_val = 0;
       ticks = 1;
       console.log(ticks);
     }
     else if (zoom_val < -1){
-      zoom_val += 1;
+      zoom_val = 0;
       ticks = -1;
     }
 
