@@ -37,9 +37,32 @@ See https://github.com/adobe-type-tools/cmap-resources
 
   <script src="viewer.js"></script>
 
+  <script type="text/javascript">
+    let isSpaced = true;
+    function init_sidearea_width(){
+      isSpaced = true;
+      update_sidearea_width();
+    }
+    function switch_sidearea_width(){
+      isSpaced = !isSpaced;
+      update_sidearea_width();
+    }
+    function update_sidearea_width(){
+      let width = isSpaced ? "70%" : "100%";
+      let text = isSpaced ? "←" : "→";
+      document.getElementById("outerContainer").style.width = width;
+      document.getElementById("sizeSwitch").innerText = text;
+    }
+    //window.onload = init_sidearea_width();
+  </script>
+
 </head>
 
 <body tabindex="1" class="loadingInProgress">
+
+  <div id="buttonContainer">
+    <button id="sizeSwitch" onclick="switch_sidearea_width();">←</button>
+  </div>
   <div id="outerContainer">
 
     <div id="sidebarContainer">
