@@ -533,6 +533,15 @@ select {
   float: right;
 }
 
+#buttonContainer {
+  width: auto;
+  height: auto;
+  position: relative;
+  float: left;
+  position: absolute;
+  z-index: 100000;
+}
+
 #sidebarContainer {
   position: absolute;
   top: 32px;
