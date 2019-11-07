@@ -339,7 +339,7 @@ function asyncGeneratorStep(gen, resolve, reject, _next, _throw, key, arg) { try
 
 function _asyncToGenerator(fn) { return function () { var self = this, args = arguments; return new Promise(function (resolve, reject) { var gen = fn.apply(self, args); function _next(value) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "next", value); } function _throw(err) { asyncGeneratorStep(gen, resolve, reject, _next, _throw, "throw", err); } _next(undefined); }); }; }
 
-var DEFAULT_SCALE_DELTA = 1.1;
+var DEFAULT_SCALE_DELTA = 1.04;
 var DISABLE_AUTO_FETCH_LOADING_BAR_TIMEOUT = 5000;
 var FORCE_PAGES_LOADED_TIMEOUT = 10000;
 var WHEEL_ZOOM_DISABLED_TIMEOUT = 1000;
@@ -780,7 +780,7 @@ var PDFViewerApplication = {
 
     do {
       newScale = (newScale * DEFAULT_SCALE_DELTA).toFixed(2);
-      newScale = Math.ceil(newScale * 10) / 10;
+      newScale = Math.ceil(newScale * 100) / 100;
       newScale = Math.min(_ui_utils.MAX_SCALE, newScale);
     } while (--ticks > 0 && newScale < _ui_utils.MAX_SCALE);
 
@@ -791,7 +791,7 @@ var PDFViewerApplication = {
 
     do {
       newScale = (newScale / DEFAULT_SCALE_DELTA).toFixed(2);
-      newScale = Math.floor(newScale * 10) / 10;
+      newScale = Math.floor(newScale * 100) / 100;
       newScale = Math.max(_ui_utils.MIN_SCALE, newScale);
     } while (--ticks > 0 && newScale > _ui_utils.MIN_SCALE);
 
@@ -2295,20 +2295,14 @@ function webViewerWheel(evt) {
     var ticks = 0;
     zoom_val += delta * MOUSE_WHEEL_DELTA_PER_PAGE_SCALE;
     if (zoom_val > 1){
-      zoom_val = 0;
-      ticks = 1;
-      console.log(ticks);
+      ticks = Math.floor(zoom_val)
+      zoom_val -= ticks;
+      PDFViewerApplication.zoomIn(ticks);
     }
     else if (zoom_val < -1){
-      zoom_val = 0;
-      ticks = -1;
-    }
-
-    if (ticks < 0) {
-      PDFViewerApplication.zoomOut(-ticks);
-    }
-    else if (ticks > 0) {
-      PDFViewerApplication.zoomIn(ticks);
+      ticks = Math.floor(-zoom_val);
+      zoom_val += ticks;
+      PDFViewerApplication.zoomOut(ticks);
     }
 
     var currentScale = pdfViewer.currentScale;
